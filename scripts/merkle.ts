@@ -5,7 +5,7 @@ import csv from "csv-parser";
 import { MerkleTree } from "merkletreejs";
 import keccak256 from "keccak256";
 
-const CSV_FILE_PATH = "airdrop/airdrop.csv";
+const CSV_FILE_PATH = "airdrop/airdropAddresses.csv";
 
 const leafNodes: Buffer[] = [];
 
