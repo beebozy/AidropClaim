@@ -1,4 +1,3 @@
-
 import { ethers } from "hardhat";
 import fs from "fs";
 import csv from "csv-parser";
@@ -11,21 +10,36 @@ const leafNodes: Buffer[] = [];
 
 fs.createReadStream(CSV_FILE_PATH)
 	.pipe(csv())
-	.on("data", (row: { address: string; amount: number }) => {
-		const address = row.address;
-		const amount = ethers.parseUnits(row.amount.toString(), 18);
+	.on("data", (row: { account: string; amount: number }) => {
+		const address = row.account;  // Changed from row.address to row.account
 
-		// Correct hashing to create a leaf node (bytes32)
+		// Validate the Ethereum address
+		if (!ethers.isAddress(address)) {
+			console.error(`Invalid address detected: ${address}`);
+			return;
+		}
+
+		// Check if amount is valid
+		if (!row.amount) {
+			console.error(`Missing amount for address: ${address}`);
+			return;
+		}
+
+		const amount = ethers.parseUnits(row.amount.toString(), 18); // Convert to Wei
+
+		// Hashing to create a leaf node (bytes32)
 		const leaf = keccak256(
 			ethers.solidityPacked(["address", "uint256"], [address, amount])
 		);
-		// console.log(leaf.toString('utf-8'))
-		leafNodes.push(leaf);
 
-		// Convert buffer to a readable hex string and print it
-		//   console.log(`Leaf (Hex): ${leaf.toString('hex')}`);
+		leafNodes.push(leaf);
 	})
 	.on("end", () => {
+		if (leafNodes.length === 0) {
+			console.error("No valid entries found in the CSV file.");
+			return;
+		}
+
 		const merkleTree = new MerkleTree(leafNodes, keccak256, {
 			sortPairs: true,
 		});
@@ -34,8 +48,8 @@ fs.createReadStream(CSV_FILE_PATH)
 		console.log("Merkle Root:", rootHash);
 
 		// Extracting proof for this address
-		const address = "0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2";
-		const amount = ethers.parseUnits("234", 18);
+		const address = "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266";
+		const amount = ethers.parseUnits("100", 18); // Example amount
 
 		// Create leaf for proof
 		const leaf = keccak256(
@@ -47,5 +61,3 @@ fs.createReadStream(CSV_FILE_PATH)
 		const proof = merkleTree.getHexProof(leaf);
 		console.log("Proof:", proof);
 	});
-
-// need to install dependencies
