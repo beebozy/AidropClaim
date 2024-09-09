@@ -61,3 +61,10 @@ fs.createReadStream(CSV_FILE_PATH)
 		const proof = merkleTree.getHexProof(leaf);
 		console.log("Proof:", proof);
 	});
+
+	/*[
+  0x6d02dcf5be716142f165545da29baa1e8a96192c696d0271455f4fbccde1228d,
+  0x443724efd888a9e47fac469758dfce1d7c21c60acf0d77a826df1ac380d1f0d4,
+  0xb764436f1c5975cc6156442bb6a3fb925223716441c23ac0e2057a306e39a343,
+  0xf0af0b142f086e388118a444fb8dd7fe1629b03b7a2d883207fdd558c0054f07
+] */
